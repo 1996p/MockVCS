@@ -1,0 +1,157 @@
+﻿@page "/counter"
+@rendermode InteractiveServer
+
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+@using ooap_lab_1.Models
+@using Shared
+
+<MudPopoverProvider></MudPopoverProvider>
+<MudSnackbarProvider />
+
+<MudDialogProvider FullWidth="true"
+                   MaxWidth="MaxWidth.ExtraSmall"
+                   CloseButton="true"
+                   DisableBackdropClick="true"
+                   NoHeader="true"
+                   Position="DialogPosition.Center"
+                   CloseOnEscapeKey="true" />
+
+<PageTitle>Counter</PageTitle>
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="Мои проекты">
+        @if (MyProjects.Count == 0)
+        {
+            <MudText>
+                У вас пока нет проектов :(
+            </MudText>
+        }
+        else
+        {
+            <MudTable Items="@MyProjects" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Id</MudTh>
+                    <MudTh>Имя проекта</MudTh>
+                    <MudTh>Последнее время обновления</MudTh>
+                    <MudTh>Исходный код</MudTh>
+                    <MudTh>Инструменты</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Id">@context.Id</MudTd>
+                    <MudTd DataLabel="Имя проекта">@context.Name</MudTd>
+                    <MudTd DataLabel="Последнее время обновления">@context.LastUpdateTime</MudTd>
+                    <MudTd DataLabel="Исходный код">@context.SourceCode</MudTd>
+                    <MudTd DataLabel="Инструменты">
+                        <div>
+                            <MudTooltip Text="Отправить в хранилище">
+                                <MudIconButton OnClick="@(() => UploadToRemoteStorage(context))" Icon="@Icons.Material.Filled.Upload" />
+                            </MudTooltip>
+                            
+                            <MudTooltip Text="Изменить">
+                                <MudIconButton OnClick="OpenDialog" Icon="@Icons.Material.Filled.EditNote" />
+                            </MudTooltip>
+                            <MudTooltip Text="Удалить" Color="Color.Error">
+                                <MudIconButton OnClick="@(() => DeleteFromMyProjects(context))" Icon="@Icons.Material.Filled.PlaylistRemove" />
+                            </MudTooltip>                                       
+                        </div>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>   
+        }
+    </MudTabPanel>
+    <MudTabPanel Text="Удаленное хранилище">
+        @if (RemoteProjects.Count == 0)
+        {
+            <MudText>
+                Тут пока пусто :( 
+                <br/>
+                Загрузите проект первым!
+            </MudText>
+        }
+        else
+        {
+            <MudTable Items="@RemoteProjects" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Id</MudTh>
+                    <MudTh>Имя проекта</MudTh>
+                    <MudTh>Последнее время обновления</MudTh>
+                    <MudTh>Исходный код</MudTh>
+                    <MudTh>Инструменты</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Id">@context.Id</MudTd>
+                    <MudTd DataLabel="Имя проекта">@context.Name</MudTd>
+                    <MudTd DataLabel="Последнее время обновления">@context.LastUpdateTime</MudTd>
+                    <MudTd DataLabel="Исходный код">@context.SourceCode</MudTd>
+                    <MudTd DataLabel="Инструменты">
+                        <div>
+                            <MudTooltip Text="Добавить себе">
+                                <MudIconButton OnClick="@(() => DownloadToMyProjects(context))" Icon="@Icons.Material.Filled.Download" />
+                            </MudTooltip>
+
+                            <MudTooltip Text="Удалить" Color="Color.Error">
+                                <MudIconButton Icon="@Icons.Material.Filled.PlaylistRemove" />
+                            </MudTooltip>
+                        </div>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudTabPanel>
+</MudTabs>
+
+
+@code {
+    private List<Project> MyProjects = new()
+    {
+        new Project(1, "PasswordGenerator", DateTime.UtcNow, "print(\"gdfgdfg321DSF+432\"))"),    
+        new Project(2, "myShop", DateTime.UtcNow, "Shop myShop = new Shop(\"my\"));"),
+    };
+
+    private List<Project> RemoteProjects = new();
+
+    private void UploadToRemoteStorage(Project project)
+    {
+        try
+        {
+            RemoteProjects.Add(project.Copy());
+
+            Snackbar.Add("Проект успешно отправлен!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Упс.. произошла ошибка", Severity.Error);
+        }
+
+    }
+
+    private void DownloadToMyProjects(Project project)
+    {
+        try
+        {
+            MyProjects.Add(project.Copy());
+
+            Snackbar.Add("Проект скачен отправлен!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Упс.. произошла ошибка", Severity.Error);
+        }
+
+    }
+
+    private void DeleteFromMyProjects(Project project)
+    {
+        MyProjects.Remove(project);
+
+        Snackbar.Add("Проект успешно удален!", Severity.Success);
+    }
+
+    private void OpenDialog()
+    {
+        var options = new DialogOptions();
+        DialogService.Show<EditProjectDialog>("Simple Dialog", options);
+    }
+
+}

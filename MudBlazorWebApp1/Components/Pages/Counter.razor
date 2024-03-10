@@ -1,4 +1,4 @@
-﻿@page "/counter"
+﻿@page "/"
 @rendermode InteractiveServer
 
 @inject ISnackbar Snackbar
@@ -168,6 +168,22 @@
     }
 
     private void DownloadToMyProjects(Project project)
+    {
+        try
+        {
+
+            MyProjects.Add(project.Copy());
+
+            Snackbar.Add("Проект скачен отправлен!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Упс.. произошла ошибка", Severity.Error);
+        }
+
+    }
+
+    private void DownloadToMyProjectsWithoutPrototype(Project project)
     {
         try
         {

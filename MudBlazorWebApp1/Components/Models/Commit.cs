@@ -1,5 +1,6 @@
 ﻿namespace MudBlazorWebApp1.Components.Models
 {
+    [Serializable]
     public class Commit
     {
         public string Message { get; set; }

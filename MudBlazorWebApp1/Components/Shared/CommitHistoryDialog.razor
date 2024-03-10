@@ -1,0 +1,40 @@
+﻿@using ooap_lab_1.Models
+@using MudBlazorWebApp1.Components.Models
+
+<MudDialog >
+    <DialogContent >
+        <MudTable Items="@Project.Commits" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+            <HeaderContent>
+                <MudTh>Сообщение</MudTh>
+                <MudTh>Исходный код</MudTh>
+                <MudTh>Последнее время обновления</MudTh>            
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Message</MudTd>
+                <MudTd DataLabel="Имя проекта">@context.SourceCode</MudTd>
+                <MudTd DataLabel="Последнее время обновления">@context.DateTime</MudTd>            
+            </RowTemplate>
+        </MudTable>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Project Project { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Project.Commits.Reverse();
+    }
+
+    void Submit()
+    {     
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}

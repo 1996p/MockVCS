@@ -1,7 +1,15 @@
-﻿<MudDialog>
+﻿@using ooap_lab_1.Models
+@using MudBlazorWebApp1.Components.Models
+
+<MudDialog>
     <DialogContent>
-        Dialog Content
-    </DialogContent>
+        <div>
+            <MudText>@Project.Name</MudText>
+            <MudTextField T=string @bind-Value=@sourceCode Label="Исходный код" />
+            <MudTextField T=string @bind-Value=@commitMessage Label="Пояснение к изменению" />
+
+        </div>
+   </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
         <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
@@ -10,7 +18,28 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Project Project { get; set; }
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    private string commitMessage = String.Empty;
+    private string sourceCode = String.Empty;
+
+    protected override void OnInitialized()
+    {
+        sourceCode = Project.Commits[Project.Commits.Count() - 1].SourceCode;
+    }
+
+
+    void Submit()
+    {
+        if (commitMessage != string.Empty)
+        {
+            Project.Commits.Add(new Commit(commitMessage, sourceCode));
+        }
+
+        MudDialog.Close(DialogResult.Ok(true));
+
+        StateHasChanged();
+    }
+
     void Cancel() => MudDialog.Cancel();
 }

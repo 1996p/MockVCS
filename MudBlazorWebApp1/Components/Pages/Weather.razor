@@ -1,61 +1,51 @@
-﻿@page "/weather"
+﻿@page "/monitoring"
 @rendermode InteractiveServer
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
+
+@using Shared.Monitoring
 <MyMudProviders />
+<MudSnackbarProvider />
 
-<PageTitle>Weather</PageTitle>
+<PageTitle>Monitoring</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Weather forecast</MudText>
-<MudText Class="mb-8">This component demonstrates fetching data from the server.</MudText>
+<div >
+    <div>
+        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="650px" ChartOptions="@Options" />
+        <MudButton OnClick="@Start">Start</MudButton>
+    </div>
+</div>
 
-@if (forecasts == null)
-{
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-}
-else
-{
-    <MudTable Items="forecasts" Hover="true" SortLabel="Sort By" Elevation="0">
-        <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<WeatherForecast, object>(x=>x.Date)">Date</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<WeatherForecast, object>(x=>x.TemperatureC)">Temp. (C)</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<WeatherForecast, object>(x=>x.TemperatureF)">Temp. (F)</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<WeatherForecast, object>(x=>x.Summary!)">Summary</MudTableSortLabel></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Date">@context.Date</MudTd>
-            <MudTd DataLabel="Temp. (C)">@context.TemperatureC</MudTd>
-            <MudTd DataLabel="Temp. (F)">@context.TemperatureF</MudTd>
-            <MudTd DataLabel="Summary">@context.Summary</MudTd>
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{50, 100}" />
-        </PagerContent>
-    </MudTable>
-}
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private int Index = -1;
+    public ChartOptions Options = new ChartOptions();
+    Facade facade;
 
-    protected override async Task OnInitializedAsync()
+    public List<ChartSeries> Series = new List<ChartSeries>()
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
+        new ChartSeries() { Name = "Dollar", Data = new double[] { 90,  } },
+        new ChartSeries() { Name = "Euro", Data = new double[] { 95,  } },
+    };
+    public string[] XAxisLabels = { DateTime.Now.ToString("yyyy-MM-dd HH-mm") };
 
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
+    protected override void OnInitialized()
+    {
+        facade = new(Snackbar);
+
+        base.OnInitialized();
     }
 
-    private class WeatherForecast
+    private void Start()
     {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    
+        List<string> XAxisTemp = XAxisLabels.ToList();
+        facade.StartMonitoring(Series, XAxisTemp);
+        XAxisLabels = XAxisTemp.ToArray();
+
+
+        StateHasChanged();
+      
     }
 }

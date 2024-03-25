@@ -36,21 +36,19 @@ namespace ooap_lab_1.Models
             return new Project(Id, Name, Commits);
         }
 
-        public Project CopyWithSerialization()
-        {
-            object project = null;
-            using (MemoryStream tempStream = new MemoryStream())
-            {
-#pragma warning disable SYSLIB0011 // Тип или член устарел
-                var binFormatter = new BinaryFormatter();
-#pragma warning restore SYSLIB0011 // Тип или член устарел
+        //public Project CopyWithSerialization()
+        //{
+        //    object project = null;
+        //    using (MemoryStream tempStream = new MemoryStream())
+        //    {
+        //        var binFormatter = new BinaryFormatter();
 
-                binFormatter.Serialize(tempStream, this);
-                tempStream.Seek(0, SeekOrigin.Begin);
+        //        binFormatter.Serialize(tempStream, this);
+        //        tempStream.Seek(0, SeekOrigin.Begin);
 
-                project = binFormatter.Deserialize(tempStream);
-            }
-            return (Project)project;
-        }
+        //        project = binFormatter.Deserialize(tempStream);
+        //    }
+        //    return (Project)project;
+        //}
     }
 }

@@ -3,7 +3,7 @@
 
 <MudDialog >
     <DialogContent >
-        <MudTable Items="@Project.Commits" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+        <MudTable Items="@Project.Commits.OrderByDescending(x => x.DateTime)" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
             <HeaderContent>
                 <MudTh>Сообщение</MudTh>
                 <MudTh>Исходный код</MudTh>
@@ -26,10 +26,6 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Project Project { get; set; }
 
-    protected override void OnInitialized()
-    {
-        Project.Commits.Reverse();
-    }
 
     void Submit()
     {     

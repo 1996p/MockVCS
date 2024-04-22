@@ -4,6 +4,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
+@using MudBlazorWebApp1.Components.Models.Tests
 @using ooap_lab_1.Models
 @using Shared
 @using MudBlazorWebApp1.Components.Models
@@ -149,6 +150,8 @@
 
                 newCommit.SourceCode = commit.SourceCode;
                 newCommit.Message = commit.Message;
+
+                
 
                 newProject.Commits.Add(newCommit);
             }

@@ -1,6 +1,10 @@
 ﻿@using ooap_lab_1.Models
 @using MudBlazorWebApp1.Components.Models
 
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+@using MudBlazorWebApp1.Components.Models.Tests
 <MudDialog>
     <DialogContent>
         <div>
@@ -33,6 +37,20 @@
     {
         if (commitMessage != string.Empty)
         {
+            var newCommit = new Commit(commitMessage, sourceCode);
+
+            JiraTests jiraTests = new();
+            newCommit.SetTestType(jiraTests);
+            var result = newCommit.StartTest();
+
+            if (result)
+            {
+                Snackbar.Add("Все тесты прошли успешно!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Тесты завалены!", Severity.Error);
+            }
             Project.Commits.Add(new Commit(commitMessage, sourceCode));
         }
 

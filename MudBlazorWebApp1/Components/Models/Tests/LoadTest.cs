@@ -4,7 +4,7 @@
     {
         public bool GetTestResult()
         {
-            Thread.Sleep(1000);
+            
 
             Random random = new Random();
 
@@ -12,5 +12,25 @@
 
             return value > 50;
         }
+
+        public LoadTest(string name)
+        {
+            Name = name;
+        }
+
+        public readonly string Name;
+
+        // Note: this is important so the MudSelect can compare pizzas
+        public override bool Equals(object o)
+        {
+            var other = o as LoadTest;
+            return other?.Name == Name;
+        }
+
+        // Note: this is important too!
+        public override int GetHashCode() => Name?.GetHashCode() ?? 0;
+
+        // Implement this for the Pizza to display correctly in MudSelect
+        public override string ToString() => Name;
     }
 }

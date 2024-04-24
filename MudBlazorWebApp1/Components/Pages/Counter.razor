@@ -106,11 +106,15 @@
                 </RowTemplate>
             </MudTable>
         }
+        
     </MudTabPanel>
 </MudTabs>
 
 
 @code {
+    ITest selected;
+    public JiraTests jiraTests = new("Тесты Jira");
+    public LoadTest loadTest = new("Нагрузочное тестирование");
     private List<Project> MyProjects = new()
     {
         new Project(1, "PasswordGenerator", new List<Commit>() { new Commit("init", "print(\"gdfgdfg321DSF+432\"))") }),

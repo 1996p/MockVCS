@@ -5,13 +5,17 @@
 @inject IDialogService DialogService
 
 @using MudBlazorWebApp1.Components.Models.Tests
+
+
 <MudDialog>
     <DialogContent>
         <div>
             <MudText>@Project.Name</MudText>
             <MudTextField T=string @bind-Value=@sourceCode Label="Исходный код" />
             <MudTextField T=string @bind-Value=@commitMessage Label="Пояснение к изменению" />
-
+            
+            <MudButton OnClick="@(() => ChooseType(jiraTests))">Выбрать тесты jira</MudButton>
+            <MudButton OnClick="@(() => ChooseType(loadTest))">Выбрать нагрузочные тесты</MudButton>
         </div>
    </DialogContent>
     <DialogActions>
@@ -24,14 +28,26 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Project Project { get; set; }
 
+
+
     private string commitMessage = String.Empty;
     private string sourceCode = String.Empty;
+    public JiraTests jiraTests = new("Тесты Jira");
+    public LoadTest loadTest = new("Нагрузочное тестирование");
+    ITest selected;
 
     protected override void OnInitialized()
     {
+        selected = jiraTests;
         sourceCode = Project.Commits[Project.Commits.Count() - 1].SourceCode;
+
     }
 
+    private void ChooseType(ITest test)
+    {
+        selected = test;
+        Snackbar.Add($"Выбрано: {test.ToString()}", Severity.Success);
+    }
 
     void Submit()
     {
@@ -39,8 +55,8 @@
         {
             var newCommit = new Commit(commitMessage, sourceCode);
 
-            JiraTests jiraTests = new();
-            newCommit.SetTestType(jiraTests);
+            
+            newCommit.SetTestType(selected);
             var result = newCommit.StartTest();
 
             if (result)
